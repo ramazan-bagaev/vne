@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 	"os/exec"
 )
 
@@ -19,7 +19,7 @@ func createUser(user string) {
 	s2 := "-addUser"
 	s3 := "-password"
 	s4 := "pass"
-	
+
 	cmd := exec.Command(s1, s2, user, s3, s4)
 	out, err := cmd.Output()
 	check(err)
@@ -38,12 +38,6 @@ func deleteUser(user string) {
 }
 
 func main() {
-	//dat, err := os.ReadFile(".vne-config")
-
-	//check(err)
-
-	//fmt.Print(string(dat))
-
 	arg := os.Args[1]
 
 	switch arg {
