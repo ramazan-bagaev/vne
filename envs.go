@@ -1,20 +1,20 @@
 package main
 
 import (
-	"os"
-	"regexp"
 	"fmt"
 	"log"
+	"os"
+	"regexp"
 	"strings"
 )
 
 type Env struct {
-	Name string
-	EnvVariables map[string]string 
+	Name         string
+	EnvVariables map[string]string
 }
 
 func CreateEnv(name string) *Env {
-	return &Env{ Name: name }
+	return &Env{Name: name}
 }
 
 func (e Env) ConfigPath() string {
@@ -45,12 +45,12 @@ func (e *Env) Retrieve() {
 	currentConfName := "undefined"
 	for _, line := range configLines {
 		if match, _ := regexp.MatchString("\\[.", line); match {
-			currentConfName = line[1:len(line)-1]
+			currentConfName = line[1 : len(line)-1]
 		} else {
 			configs[currentConfName] = append(configs[currentConfName], line)
 		}
 	}
-	
+
 	configEnvs := make(map[string]string)
 	for _, line := range configs["envs"] {
 		split := strings.Split(line, "=")
@@ -58,7 +58,7 @@ func (e *Env) Retrieve() {
 			log.Println("can't parse env variable")
 			return
 		}
-		
+
 		configEnvs[split[0]] = split[1]
 	}
 

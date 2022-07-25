@@ -36,7 +36,7 @@ func deleteUser(user string) {
 	check(err)
 	fmt.Println(string(out))
 }
-asmq-1.1/1//.
+
 func main() {
 	arg := os.Args[1]
 
