@@ -14,7 +14,11 @@ type Env struct {
 }
 
 func CreateEnv(name string) *Env {
-	return &Env{Name: name}
+	env := &Env{Name: name}
+
+	env.Retrieve()
+
+	return env
 }
 
 func (e Env) ConfigPath() string {
@@ -65,8 +69,12 @@ func (e *Env) Retrieve() {
 	e.EnvVariables = configEnvs
 }
 
-func (e *Env) LoadToConfig() {
-	LoadEnvVarsFromUser(e)
+func (e *Env) LoadToVNEConfig() {
+	LoadEnvVarsToVNE(e)
+}
+
+func (e *Env) UnloadToUser() {
+	UnloadEnvVarsToUser(e)
 }
 
 func (e Env) PrintEnvs() {

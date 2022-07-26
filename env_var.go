@@ -1,26 +1,39 @@
 package main
 
-import(
+import (
 	"os"
 	"strings"
 )
 
-func LoadEnvVarsFromUser(env *Env) {
+func LoadEnvVarsToVNE(env *Env) {
 	conf := env.ConfigPath()
 
 	envVars := make(map[string]string)
 
 	for _, file := range getEnvVarsLocationsForZsh(env) {
-		loadEnvVars(file, envVars)
+		loadEnvVarsFromUser(file, envVars)
 	}
 
 	env.EnvVariables = envVars
-	updateConfig(conf, &envVars)
+	updateVNEConfig(conf, &envVars)
+}
+
+func UnloadEnvVarsToUser(env *Env) {
+	fileName := getMainEnvVarFile(env)
+
+	for k, v := range env.EnvVariables {
+		err := os.WriteFile(fileName, []byte("export "+k+"="+v), 0644)
+		check(err)
+	}
+}
+
+func getMainEnvVarFile(env *Env) string {
+	return env.Home() + "/.zshenv"
 }
 
 func getEnvVarsLocationsForZsh(env *Env) []string {
-	return []string {
-		env.Home() + "/.zshenv",
+	return []string{
+		getMainEnvVarFile(env),
 		"/etc/zprofile",
 		env.Home() + "/.zprofile",
 		"/etc/zshrc",
@@ -31,7 +44,7 @@ func getEnvVarsLocationsForZsh(env *Env) []string {
 	}
 }
 
-func loadEnvVars(source string, envVars map[string]string) {
+func loadEnvVarsFromUser(source string, envVars map[string]string) {
 	_, err := os.Stat(source)
 
 	if err != nil {
@@ -60,6 +73,13 @@ func loadEnvVars(source string, envVars map[string]string) {
 	}
 }
 
-func updateConfig(config string, envVars *map[string]string) {
+func updateVNEConfig(config string, envVars *map[string]string) {
+	content := "[envs]\n"
 
+	for key, value := range *envVars {
+		content += key + "=" + value + "\n"
+	}
+
+	err := os.WriteFile(config, []byte(content), 0644)
+	check(err)
 }

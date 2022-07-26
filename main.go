@@ -43,14 +43,17 @@ func main() {
 	switch arg {
 	case "-create":
 		env := CreateEnv(os.Args[2])
-		env.Retrieve()
 		env.PrintEnvs()
 
 	case "-delete":
 		DeleteOSUser(os.Args[2])
 	case "-load":
 		env := CreateEnv(os.Args[2])
-		env.LoadToConfig()
+		env.LoadToVNEConfig()
+		env.PrintEnvs()
+	case "-unload":
+		env := CreateEnv(os.Args[2])
+		env.UnloadToUser()
 		env.PrintEnvs()
 	}
 }
