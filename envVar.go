@@ -1,13 +1,27 @@
 package main
 
 import (
+	"log"
 	"os"
 	"strings"
 )
 
-func LoadEnvVarsToVNE(env *Env) {
-	conf := env.ConfigPath()
+func GetEnvVars(configs map[string][]string) map[string]string {
+	envVars := make(map[string]string)
+	for _, line := range configs["envs"] {
+		split := strings.Split(line, "=")
+		if len(split) != 2 {
+			log.Println("can't parse env variable")
+			panic(1)
+		}
 
+		envVars[split[0]] = split[1]
+	}
+
+	return envVars
+}
+
+func LoadEnvVarsToVNE(env *Env) {
 	envVars := make(map[string]string)
 
 	for _, file := range getEnvVarsLocationsForZsh(env) {
@@ -15,7 +29,6 @@ func LoadEnvVarsToVNE(env *Env) {
 	}
 
 	env.EnvVariables = envVars
-	updateVNEConfig(conf, &envVars)
 }
 
 func UnloadEnvVarsToUser(env *Env) {
@@ -71,15 +84,4 @@ func loadEnvVarsFromUser(source string, envVars map[string]string) {
 
 		envVars[split2[0]] = split2[1]
 	}
-}
-
-func updateVNEConfig(config string, envVars *map[string]string) {
-	content := "[envs]\n"
-
-	for key, value := range *envVars {
-		content += key + "=" + value + "\n"
-	}
-
-	err := os.WriteFile(config, []byte(content), 0644)
-	Check(err)
 }

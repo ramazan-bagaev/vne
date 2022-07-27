@@ -18,6 +18,7 @@ func main() {
 		env := CreateEnv(os.Args[2])
 		env.LoadToVNEConfig()
 		env.PrintEnvs()
+		env.PrintTools()
 	case "-unload":
 		env := CreateEnv(os.Args[2])
 		env.UnloadToUser()

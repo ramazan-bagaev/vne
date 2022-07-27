@@ -1,16 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"regexp"
-	"strings"
 )
 
 type Env struct {
 	Name         string
 	EnvVariables map[string]string
+	Tools        []string
 }
 
 func CreateEnv(name string) *Env {
@@ -55,22 +54,15 @@ func (e *Env) Retrieve() {
 		}
 	}
 
-	configEnvs := make(map[string]string)
-	for _, line := range configs["envs"] {
-		split := strings.Split(line, "=")
-		if len(split) != 2 {
-			log.Println("can't parse env variable")
-			return
-		}
-
-		configEnvs[split[0]] = split[1]
-	}
-
-	e.EnvVariables = configEnvs
+	e.EnvVariables = GetEnvVars(configs)
+	e.Tools = GetTools(configs)
 }
 
 func (e *Env) LoadToVNEConfig() {
 	LoadEnvVarsToVNE(e)
+	LoadToolsToVNE(e)
+
+	updateVNEConfig(e)
 }
 
 func (e *Env) UnloadToUser() {
@@ -78,7 +70,32 @@ func (e *Env) UnloadToUser() {
 }
 
 func (e Env) PrintEnvs() {
+	log.Print("printing all env variables:")
 	for k, v := range e.EnvVariables {
-		fmt.Println(k + "=" + v)
+		log.Print(k + "=" + v)
 	}
+}
+
+func (e Env) PrintTools() {
+	log.Print("printing all tools:")
+	for _, el := range e.Tools {
+		log.Print(el)
+	}
+}
+
+func updateVNEConfig(env *Env) {
+	content := "[envs]\n"
+
+	for key, value := range env.EnvVariables {
+		content += key + "=" + value + "\n"
+	}
+
+	content += "[tools]\n"
+
+	for _, tool := range env.Tools {
+		content += tool + "\n"
+	}
+
+	err := os.WriteFile(env.ConfigPath(), []byte(content), 0644)
+	Check(err)
 }
