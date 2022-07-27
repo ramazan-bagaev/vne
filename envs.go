@@ -33,7 +33,7 @@ func (e *Env) Retrieve() {
 	_, err := os.Stat(e.Home())
 
 	if err != nil {
-		CreateOSUser(e.Name)
+		GetUserManager().Create(e.Name)
 	}
 
 	_, err = os.Stat(e.ConfigPath())

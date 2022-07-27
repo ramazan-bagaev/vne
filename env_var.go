@@ -23,7 +23,7 @@ func UnloadEnvVarsToUser(env *Env) {
 
 	for k, v := range env.EnvVariables {
 		err := os.WriteFile(fileName, []byte("export "+k+"="+v), 0644)
-		check(err)
+		Check(err)
 	}
 }
 
@@ -81,5 +81,5 @@ func updateVNEConfig(config string, envVars *map[string]string) {
 	}
 
 	err := os.WriteFile(config, []byte(content), 0644)
-	check(err)
+	Check(err)
 }
