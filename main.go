@@ -9,11 +9,9 @@ func main() {
 
 	switch arg {
 	case "-create":
-		env := CreateEnv(os.Args[2])
-		env.PrintEnvs()
-
+		GetOS().Create(os.Args[2])
 	case "-delete":
-		GetUserManager().Delete(os.Args[2])
+		GetOS().Delete(os.Args[2])
 	case "-load":
 		env := CreateEnv(os.Args[2])
 		env.LoadToVNEConfig()

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"bufio"
+	"os"
 )
 
 func ParseFile(path string) []string {
@@ -18,12 +18,12 @@ func ParseFile(path string) []string {
 
 		res = append(res, str)
 	}
-	
+
 	return res
 }
 
 func Check(e error) {
 	if e != nil {
-		panic(e)
+		panic(e.Error())
 	}
 }

@@ -10,6 +10,8 @@ type Env struct {
 	Name         string
 	EnvVariables map[string]string
 	Tools        []string
+	Console
+	OS
 }
 
 func CreateEnv(name string) *Env {
@@ -29,11 +31,15 @@ func (e Env) Home() string {
 }
 
 func (e *Env) Retrieve() {
-	_, err := os.Stat(e.Home())
+	_, err := os.Stat(e.Home()) // TODO: check real users, not directories in /home or whatever
 
 	if err != nil {
-		GetUserManager().Create(e.Name)
+		log.Fatalf("should create env first: 'sudo vne -create %s', then login as a new user: 'login %s'", e.Name, e.Name)
 	}
+
+	e.OS = GetOS()
+
+	e.OS.CheckUser(e.Name)
 
 	_, err = os.Stat(e.ConfigPath())
 
@@ -56,6 +62,7 @@ func (e *Env) Retrieve() {
 
 	e.EnvVariables = GetEnvVars(configs)
 	e.Tools = GetTools(configs)
+	e.Console = GetConsole(e.OS.GetShellPath(e.Name))
 }
 
 func (e *Env) LoadToVNEConfig() {

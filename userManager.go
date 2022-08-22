@@ -2,28 +2,18 @@ package main
 
 import (
 	"log"
+	"os"
 	"os/exec"
-	"runtime"
 )
 
 type UserManager interface {
 	Create(user string)
 	Delete(user string)
+	CheckUser(user string)
 }
 
-func GetUserManager() UserManager {
-	if runtime.GOOS == "darwin" {
-		return macOS{}
-	}
-
-	log.Fatal("this os is not implemented")
-	panic(1)
-}
-
-type macOS struct {
-}
-
-func (mc macOS) Create(user string) {
+func (mc mac) Create(user string) {
+	mc.CheckUser("root")
 	log.Printf("start creating user: %s", user)
 
 	s1 := "sysadminctl"
@@ -32,18 +22,27 @@ func (mc macOS) Create(user string) {
 	s4 := "pass"
 
 	cmd := exec.Command(s1, s2, user, s3, s4)
+	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	Check(err)
 	log.Print(string(out))
 }
 
-func (mc macOS) Delete(user string) {
+func (mc mac) Delete(user string) {
+	mc.CheckUser("root")
 	log.Printf("start deleting user: %s", user)
 	s1 := "sysadminctl"
 	s2 := "-deleteUser"
 
 	cmd := exec.Command(s1, s2, user)
+	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	Check(err)
-	log.Print(string(out))
+	log.Println(string(out))
+}
+
+func (mc mac) CheckUser(user string) {
+	if os.Getenv("USER") != user {
+		log.Fatalf("you should login as %s", user)
+	}
 }

@@ -24,7 +24,7 @@ func GetEnvVars(configs map[string][]string) map[string]string {
 func LoadEnvVarsToVNE(env *Env) {
 	envVars := make(map[string]string)
 
-	for _, file := range getEnvVarsLocationsForZsh(env) {
+	for _, file := range env.Console.GetEnvVarsLocations(env) {
 		loadEnvVarsFromUser(file, envVars)
 	}
 
@@ -32,28 +32,11 @@ func LoadEnvVarsToVNE(env *Env) {
 }
 
 func UnloadEnvVarsToUser(env *Env) {
-	fileName := getMainEnvVarFile(env)
+	fileName := env.Console.GetMainEnvVarFile(env)
 
 	for k, v := range env.EnvVariables {
 		err := os.WriteFile(fileName, []byte("export "+k+"="+v), 0644)
 		Check(err)
-	}
-}
-
-func getMainEnvVarFile(env *Env) string {
-	return env.Home() + "/.zshenv"
-}
-
-func getEnvVarsLocationsForZsh(env *Env) []string {
-	return []string{
-		getMainEnvVarFile(env),
-		"/etc/zprofile",
-		env.Home() + "/.zprofile",
-		"/etc/zshrc",
-		env.Home() + "/.zshrc",
-		"/etc/zlogin",
-		env.Home() + "/.zlogin",
-		"/etc/zshenv",
 	}
 }
 
