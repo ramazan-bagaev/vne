@@ -12,16 +12,16 @@ func GetTools(configs map[string][]string) []string {
 	return configs["tools"]
 }
 
-func LoadToolsToVNE(env *Env) {
+func GetUserTools(env *Env) []string {
 	tools := []string{}
 
 	ct := GetCreationDate()
 
 	for _, dir := range getEnvToolsLocationsForZsh(env) {
-		tools = append(tools, readFromBinDir(dir, ct)...)
+		tools = append(tools, readFromBinDirNotWithSameCT(dir, ct)...)
 	}
 
-	env.Tools = tools
+	return tools
 }
 
 func getEnvToolsLocationsForZsh(env *Env) []string {
@@ -50,7 +50,7 @@ func GetCreationDate() time.Time {
 	return ct
 }
 
-func readFromBinDir(dir string, ct time.Time) []string {
+func readFromBinDirNotWithSameCT(dir string, ct time.Time) []string {
 	bins, err := ioutil.ReadDir(dir)
 
 	if err != nil {
@@ -60,10 +60,47 @@ func readFromBinDir(dir string, ct time.Time) []string {
 	binFiles := []string{}
 
 	for _, bin := range bins {
+		if strings.HasPrefix(bin.Name(), ".") {
+			continue
+		}
+
 		if bin.ModTime().Equal(ct) {
 			continue
 		}
 
+		binFiles = append(binFiles, bin.Name())
+	}
+
+	return binFiles
+}
+
+func GetAvailableToolsFromList(env *Env, tools []string) []string {
+	availableTools := []string{}
+	for _, dir := range getEnvToolsLocationsForZsh(env) {
+		bins := readFromBinDir(dir)
+
+		for _, tool := range tools {
+			for _, bin := range bins {
+				if bin == tool {
+					availableTools = append(availableTools, tool)
+				}
+			}
+		}
+	}
+
+	return availableTools
+}
+
+func readFromBinDir(dir string) []string {
+	bins, err := ioutil.ReadDir(dir)
+
+	if err != nil {
+		return []string{}
+	}
+
+	binFiles := []string{}
+
+	for _, bin := range bins {
 		binFiles = append(binFiles, bin.Name())
 	}
 

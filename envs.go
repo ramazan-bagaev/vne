@@ -66,14 +66,15 @@ func (e *Env) Retrieve() {
 }
 
 func (e *Env) LoadToVNEConfig() {
-	LoadEnvVarsToVNE(e)
-	LoadToolsToVNE(e)
+	e.EnvVariables = GetUserEnvVars(e)
+	e.Tools = GetUserTools(e)
 
 	updateVNEConfig(e)
 }
 
 func (e *Env) UnloadToUser() {
 	UnloadEnvVarsToUser(e)
+	UploadLackingTools(e)
 }
 
 func (e Env) PrintEnvs() {

@@ -21,14 +21,14 @@ func GetEnvVars(configs map[string][]string) map[string]string {
 	return envVars
 }
 
-func LoadEnvVarsToVNE(env *Env) {
+func GetUserEnvVars(env *Env) map[string]string {
 	envVars := make(map[string]string)
 
 	for _, file := range env.Console.GetEnvVarsLocations(env) {
 		loadEnvVarsFromUser(file, envVars)
 	}
 
-	env.EnvVariables = envVars
+	return envVars
 }
 
 func UnloadEnvVarsToUser(env *Env) {

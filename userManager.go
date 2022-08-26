@@ -20,8 +20,9 @@ func (mc mac) Create(user string) {
 	s2 := "-addUser"
 	s3 := "-password"
 	s4 := "pass"
+	s5 := "-admin"
 
-	cmd := exec.Command(s1, s2, user, s3, s4)
+	cmd := exec.Command(s1, s2, user, s3, s4, s5)
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	Check(err)
