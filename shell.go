@@ -4,22 +4,22 @@ import (
 	"strings"
 )
 
-func GetConsole(shellPath string) Console {
+func GetShell(shellPath string) Shell {
 	spl := strings.Split(shellPath, "/")
 
-	cnsl := spl[len(spl)-1]
+	shl := spl[len(spl)-1]
 
-	if cnsl == "zsh" {
+	if shl == "zsh" {
 		return Zsh{}
 	}
 
-	panic("can't recognize console: " + cnsl)
+	panic("can't recognize shell: " + shl)
 }
 
 type Zsh struct {
 }
 
-type Console interface {
+type Shell interface {
 	GetEnvVarsLocations(env *Env) []string
 	GetMainEnvVarFile(env *Env) string
 	Name() string

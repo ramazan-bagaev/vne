@@ -24,7 +24,7 @@ func GetEnvVars(configs map[string][]string) map[string]string {
 func GetUserEnvVars(env *Env) map[string]string {
 	envVars := make(map[string]string)
 
-	for _, file := range env.Console.GetEnvVarsLocations(env) {
+	for _, file := range env.Shell.GetEnvVarsLocations(env) {
 		loadEnvVarsFromUser(file, envVars)
 	}
 
@@ -32,12 +32,20 @@ func GetUserEnvVars(env *Env) map[string]string {
 }
 
 func UnloadEnvVarsToUser(env *Env) {
-	fileName := env.Console.GetMainEnvVarFile(env)
+	fileName := env.Shell.GetMainEnvVarFile(env)
+
+	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	Check(err)
+	defer f.Close()
+
+	addedVars := ""
 
 	for k, v := range env.EnvVariables {
-		err := os.WriteFile(fileName, []byte("export "+k+"="+v), 0644)
-		Check(err)
+		addedVars += "\nexport " + k + "=" + v + "\n"
 	}
+
+	_, err = f.WriteString(addedVars)
+	Check(err)
 }
 
 func loadEnvVarsFromUser(source string, envVars map[string]string) {

@@ -17,14 +17,14 @@ func GetUserTools(env *Env) []string {
 
 	ct := GetCreationDate()
 
-	for _, dir := range getEnvToolsLocationsForZsh(env) {
+	for _, dir := range getEnvToolsLocations(env) {
 		tools = append(tools, readFromBinDirNotWithSameCT(dir, ct)...)
 	}
 
 	return tools
 }
 
-func getEnvToolsLocationsForZsh(env *Env) []string {
+func getEnvToolsLocations(env *Env) []string {
 	path := os.Getenv("PATH")
 	return strings.Split(path, ":")
 }
@@ -76,7 +76,7 @@ func readFromBinDirNotWithSameCT(dir string, ct time.Time) []string {
 
 func GetAvailableToolsFromList(env *Env, tools []string) []string {
 	availableTools := []string{}
-	for _, dir := range getEnvToolsLocationsForZsh(env) {
+	for _, dir := range getEnvToolsLocations(env) {
 		bins := readFromBinDir(dir)
 
 		for _, tool := range tools {

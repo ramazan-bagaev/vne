@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/exec"
 )
@@ -20,19 +19,8 @@ func UploadLackingTools(env *Env) {
 		pm = pms[0]
 	}
 
-	userTools := GetUserTools(env)
-
 	for _, vneTool := range env.Tools {
-		isThere := false
-		for _, userTool := range userTools {
-			if vneTool == userTool {
-				isThere = true
-			}
-		}
-
-		if !isThere {
-			loadTool(vneTool, pm)
-		}
+		loadTool(vneTool, pm)
 	}
 }
 
@@ -60,8 +48,6 @@ func LoadPM(env *Env) string {
 }
 
 func loadTool(tool string, pm string) {
-	log.Println(os.Getenv("PATH"))
-	log.Println(os.Getenv("SHELL"))
 	cmd := exec.Command(pm, "install", tool)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout

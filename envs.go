@@ -10,7 +10,7 @@ type Env struct {
 	Name         string
 	EnvVariables map[string]string
 	Tools        []string
-	Console
+	Shell
 	OS
 }
 
@@ -62,19 +62,65 @@ func (e *Env) Retrieve() {
 
 	e.EnvVariables = GetEnvVars(configs)
 	e.Tools = GetTools(configs)
-	e.Console = GetConsole(e.OS.GetShellPath(e.Name))
+	e.Shell = GetShell(e.OS.GetShellPath(e.Name))
 }
 
 func (e *Env) LoadToVNEConfig() {
 	e.EnvVariables = GetUserEnvVars(e)
 	e.Tools = GetUserTools(e)
 
+	e.PrintEnvs()
+	e.PrintTools()
+
 	updateVNEConfig(e)
 }
 
 func (e *Env) UnloadToUser() {
-	UnloadEnvVarsToUser(e)
-	UploadLackingTools(e)
+	userEnv := CreateEnv(e.Name)
+	userEnv.EnvVariables = GetUserEnvVars(userEnv)
+	userEnv.Tools = GetUserTools(userEnv)
+
+	d := e.Remove(userEnv)
+
+	d.PrintEnvs()
+	d.PrintTools()
+
+	UnloadEnvVarsToUser(d)
+	UploadLackingTools(d)
+}
+
+func (e1 *Env) Remove(e2 *Env) *Env {
+	if e1.Name != e2.Name {
+		panic("remove method on env work only for same name environment")
+	}
+
+	res := CreateEnv(e1.Name)
+
+	resVars := make(map[string]string)
+	for e1K, e1V := range e1.EnvVariables {
+		if _, ok := e2.EnvVariables[e1K]; !ok {
+			resVars[e1K] = e1V
+		}
+	}
+
+	resTools := []string{}
+	for _, e1T := range e1.Tools {
+		uniq := true
+		for _, e2T := range e2.Tools {
+			if e1T == e2T {
+				uniq = false
+			}
+		}
+
+		if uniq {
+			resTools = append(resTools, e1T)
+		}
+	}
+
+	res.EnvVariables = resVars
+	res.Tools = resTools
+
+	return res
 }
 
 func (e Env) PrintEnvs() {
