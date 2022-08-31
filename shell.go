@@ -13,16 +13,22 @@ func GetShell(shellPath string) Shell {
 		return Zsh{}
 	}
 
-	panic("can't recognize shell: " + shl)
-}
+	if shl == "bash" {
+		return Bash{}
+	}
 
-type Zsh struct {
+	panic("can't recognize shell: " + shl)
 }
 
 type Shell interface {
 	GetEnvVarsLocations(env *Env) []string
 	GetMainEnvVarFile(env *Env) string
 	Name() string
+}
+
+// zsh
+
+type Zsh struct {
 }
 
 func (c Zsh) GetEnvVarsLocations(env *Env) []string {
@@ -44,4 +50,27 @@ func (c Zsh) GetMainEnvVarFile(env *Env) string {
 
 func (c Zsh) Name() string {
 	return "zsh"
+}
+
+// bash
+
+type Bash struct {
+}
+
+func (b Bash) GetEnvVarsLocations(env *Env) []string {
+	return []string{
+		"/etc/profile",
+		b.GetMainEnvVarFile(env),
+		env.Home() + "/.bash_login",
+		env.Home() + "/.profile",
+		env.Home() + "/.bashrc",
+	}
+}
+
+func (b Bash) GetMainEnvVarFile(env *Env) string {
+	return env.Home() + "/.bash_profile"
+}
+
+func (b Bash) Name() string {
+	return "bash"
 }
