@@ -63,6 +63,15 @@ func (l linux) Create(user string) {
 	out, err := cmd.Output()
 	Check(err)
 	log.Println(string(out))
+
+	log.Println("setting password..")
+	cmd = exec.Command("/bin/bash", "-c", "echo "+user+":pass | chpasswd")
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+
+	out, err = cmd.Output()
+	Check(err)
+	log.Println(string(out))
 }
 
 func (l linux) Delete(user string) {
