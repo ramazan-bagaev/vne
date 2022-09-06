@@ -18,11 +18,11 @@ func GetOS() OS {
 		return mac{}
 	}
 
-	if runtime.GOOS == "" {
+	if runtime.GOOS == "linux" {
 		return linux{}
 	}
 
-	log.Fatal("this os is not implemented")
+	log.Fatal("this os is not implemented: " + runtime.GOOS)
 	panic(1)
 }
 
