@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -15,6 +16,10 @@ type OS interface {
 func GetOS() OS {
 	if runtime.GOOS == "darwin" {
 		return mac{}
+	}
+
+	if runtime.GOOS == "" {
+		return linux{}
 	}
 
 	log.Fatal("this os is not implemented")
@@ -38,4 +43,8 @@ func (m mac) GetShellPath(user string) string {
 	Check(err)
 
 	return strings.TrimSpace(string(out))
+}
+
+func (l linux) GetShellPath(user string) string {
+	return os.Getenv("SHELL")
 }
