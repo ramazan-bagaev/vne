@@ -17,6 +17,8 @@ func GetUserTools(env *Env) []string {
 
 	ct := GetCreationDate()
 
+	log.Println(ct)
+
 	for _, dir := range getEnvToolsLocations(env) {
 		tools = append(tools, readFromBinDirNotWithSameCT(dir, ct)...)
 	}
