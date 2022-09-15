@@ -23,21 +23,20 @@ func CreateEnv(name string) *Env {
 }
 
 func (e Env) ConfigPath() string {
-	return "/Users/" + e.Name + "/.vne"
+	return e.Home() + "/.vne"
 }
 
 func (e Env) Home() string {
-	return "/Users/" + e.Name
+	return e.OS.GetUsersDir() + "/" + e.Name
 }
 
 func (e *Env) Retrieve() {
+	e.OS = GetOS()
 	_, err := os.Stat(e.Home()) // TODO: check real users, not directories in /home or whatever
 
 	if err != nil {
 		log.Fatalf("should create env first: 'sudo vne -create %s', then login as a new user: 'login %s'", e.Name, e.Name)
 	}
-
-	e.OS = GetOS()
 
 	e.OS.CheckUser(e.Name)
 

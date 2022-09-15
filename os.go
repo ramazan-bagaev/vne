@@ -11,6 +11,7 @@ import (
 type OS interface {
 	UserManager
 	GetShellPath(user string) string
+	GetUsersDir() string
 }
 
 func GetOS() OS {
@@ -45,6 +46,14 @@ func (m mac) GetShellPath(user string) string {
 	return strings.TrimSpace(string(out))
 }
 
+func (m mac) GetUsersDir() string {
+	return "/Users"
+}
+
 func (l linux) GetShellPath(user string) string {
 	return os.Getenv("SHELL")
+}
+
+func (l linux) GetUsersDir() string {
+	return "/home"
 }
