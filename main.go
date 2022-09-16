@@ -5,18 +5,18 @@ import (
 )
 
 func main() {
-	arg := os.Args[1]
+	cmd := ParseCommand(os.Args)
 
-	switch arg {
-	case "-create":
-		GetOS().Create(os.Args[2])
-	case "-delete":
-		GetOS().Delete(os.Args[2])
-	case "-load":
-		env := CreateEnv(os.Args[2])
+	switch cmd.Cmd {
+	case "create":
+		GetOS().Create(cmd.User)
+	case "delete":
+		GetOS().Delete(cmd.User)
+	case "load":
+		env := CreateEnv(cmd.User, cmd.ConfigPath)
 		env.LoadToVNEConfig()
-	case "-unload":
-		env := CreateEnv(os.Args[2])
+	case "unload":
+		env := CreateEnv(cmd.User, cmd.ConfigPath)
 		env.UnloadToUser()
 	}
 }

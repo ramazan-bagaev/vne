@@ -8,22 +8,19 @@ import (
 
 type Env struct {
 	Name         string
+	ConfigPath   string
 	EnvVariables map[string]string
 	Tools        []string
 	Shell
 	OS
 }
 
-func CreateEnv(name string) *Env {
-	env := &Env{Name: name}
+func CreateEnv(name string, config string) *Env {
+	env := &Env{Name: name, ConfigPath: config}
 
 	env.Retrieve()
 
 	return env
-}
-
-func (e Env) ConfigPath() string {
-	return e.Home() + "/.vne"
 }
 
 func (e Env) Home() string {
@@ -40,15 +37,15 @@ func (e *Env) Retrieve() {
 
 	e.OS.CheckUser(e.Name)
 
-	_, err = os.Stat(e.ConfigPath())
+	_, err = os.Stat(e.ConfigPath)
 
 	if err != nil {
-		_, err = os.Create(e.ConfigPath())
+		_, err = os.Create(e.ConfigPath)
 
 		Check(err)
 	}
 
-	configLines := ParseFile(e.ConfigPath())
+	configLines := ParseFile(e.ConfigPath)
 	configs := make(map[string][]string)
 	currentConfName := "undefined"
 	for _, line := range configLines {
@@ -75,7 +72,7 @@ func (e *Env) LoadToVNEConfig() {
 }
 
 func (e *Env) UnloadToUser() {
-	userEnv := CreateEnv(e.Name)
+	userEnv := CreateEnv(e.Name, e.ConfigPath)
 	userEnv.EnvVariables = GetUserEnvVars(userEnv)
 	userEnv.Tools = GetUserTools(userEnv)
 
@@ -93,7 +90,7 @@ func (e1 *Env) Remove(e2 *Env) *Env {
 		panic("remove method on env work only for same name environment")
 	}
 
-	res := CreateEnv(e1.Name)
+	res := CreateEnv(e1.Name, e1.ConfigPath)
 
 	resVars := make(map[string]string)
 	for e1K, e1V := range e1.EnvVariables {
@@ -149,6 +146,6 @@ func updateVNEConfig(env *Env) {
 		content += tool + "\n"
 	}
 
-	err := os.WriteFile(env.ConfigPath(), []byte(content), 0644)
+	err := os.WriteFile(env.ConfigPath, []byte(content), 0644)
 	Check(err)
 }
