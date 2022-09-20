@@ -3,14 +3,17 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 type Env struct {
-	Name         string
-	ConfigPath   string
-	EnvVariables map[string]string
-	Tools        []string
+	Name       string
+	ConfigPath string
+	EnvVars    map[string]string
+	Tools      []string
+	Dirs       []string
 	Shell
 	OS
 }
@@ -56,24 +59,26 @@ func (e *Env) Retrieve() {
 		}
 	}
 
-	e.EnvVariables = GetEnvVars(configs)
+	e.EnvVars = GetEnvVars(configs)
 	e.Tools = GetTools(configs)
+	e.Dirs = configs["dirs"]
 	e.Shell = GetShell(e.OS.GetShellPath(e.Name))
 }
 
 func (e *Env) LoadToVNEConfig() {
-	e.EnvVariables = GetUserEnvVars(e)
+	e.EnvVars = GetUserEnvVars(e)
 	e.Tools = GetUserTools(e)
 
 	e.PrintEnvs()
 	e.PrintTools()
+	e.PrintDirs()
 
 	updateVNEConfig(e)
 }
 
 func (e *Env) UnloadToUser() {
 	userEnv := CreateEnv(e.Name, e.ConfigPath)
-	userEnv.EnvVariables = GetUserEnvVars(userEnv)
+	userEnv.EnvVars = GetUserEnvVars(userEnv)
 	userEnv.Tools = GetUserTools(userEnv)
 
 	d := e.Remove(userEnv)
@@ -83,6 +88,24 @@ func (e *Env) UnloadToUser() {
 
 	UnloadEnvVarsToUser(d)
 	UploadLackingTools(d)
+	CreateDirs(e)
+}
+
+func CreateDirs(e *Env) {
+	for _, dir := range e.Dirs {
+		if _, err := os.Stat(dir); err != nil {
+			home := e.Home()
+			var path string
+			if dir == "~" {
+				path = home
+			} else if strings.HasPrefix(dir, "~/") {
+				path = filepath.Join(home, dir[2:])
+			}
+			log.Print("creating dir: " + path)
+			err := os.Mkdir(path, 0744) // TODO: have no idea which permissions
+			Check(err)
+		}
+	}
 }
 
 func (e1 *Env) Remove(e2 *Env) *Env {
@@ -93,8 +116,8 @@ func (e1 *Env) Remove(e2 *Env) *Env {
 	res := CreateEnv(e1.Name, e1.ConfigPath)
 
 	resVars := make(map[string]string)
-	for e1K, e1V := range e1.EnvVariables {
-		if _, ok := e2.EnvVariables[e1K]; !ok {
+	for e1K, e1V := range e1.EnvVars {
+		if _, ok := e2.EnvVars[e1K]; !ok {
 			resVars[e1K] = e1V
 		}
 	}
@@ -113,7 +136,7 @@ func (e1 *Env) Remove(e2 *Env) *Env {
 		}
 	}
 
-	res.EnvVariables = resVars
+	res.EnvVars = resVars
 	res.Tools = resTools
 
 	return res
@@ -121,7 +144,7 @@ func (e1 *Env) Remove(e2 *Env) *Env {
 
 func (e Env) PrintEnvs() {
 	log.Print("printing all env variables:")
-	for k, v := range e.EnvVariables {
+	for k, v := range e.EnvVars {
 		log.Print(k + "=" + v)
 	}
 }
@@ -133,10 +156,17 @@ func (e Env) PrintTools() {
 	}
 }
 
+func (e Env) PrintDirs() {
+	log.Print("printing all dirs:")
+	for _, el := range e.Dirs {
+		log.Print(el)
+	}
+}
+
 func updateVNEConfig(env *Env) {
 	content := "[envs]\n"
 
-	for key, value := range env.EnvVariables {
+	for key, value := range env.EnvVars {
 		content += key + "=" + value + "\n"
 	}
 
@@ -146,6 +176,12 @@ func updateVNEConfig(env *Env) {
 		content += tool + "\n"
 	}
 
-	err := os.WriteFile(env.ConfigPath, []byte(content), 0644)
+	content += "[dirs]\n"
+
+	for _, dir := range env.Dirs {
+		content += dir + "\n"
+	}
+
+	err := os.WriteFile(env.ConfigPath, []byte(content), 0644) // TODO: deal with permissions
 	Check(err)
 }

@@ -40,7 +40,7 @@ func UnloadEnvVarsToUser(env *Env) {
 
 	addedVars := ""
 
-	for k, v := range env.EnvVariables {
+	for k, v := range env.EnvVars {
 		addedVars += "\nexport " + k + "=" + v + "\n"
 	}
 
