@@ -9,14 +9,23 @@ func main() {
 
 	switch cmd.Cmd {
 	case "create":
-		GetOS().Create(cmd.User)
+		var conf *Config
+		if cmd.ConfigPath != "" {
+			conf = CreateConfig(cmd.ConfigPath)
+		} else {
+			conf = CreateEmptyConfig()
+		}
+
+		GetOS().Create(cmd.User, conf)
 	case "delete":
 		GetOS().Delete(cmd.User)
 	case "load":
-		env := CreateEnv(cmd.User, cmd.ConfigPath)
-		env.LoadToVNEConfig()
+		env := RetrieveEnv(cmd.User)
+
+		env.LoadToVNEConfig(cmd.ConfigPath)
 	case "unload":
-		env := CreateEnv(cmd.User, cmd.ConfigPath)
-		env.UnloadToUser()
+		env := RetrieveEnv(cmd.User)
+
+		env.UnloadToUser(cmd.ConfigPath)
 	}
 }

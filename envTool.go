@@ -8,16 +8,10 @@ import (
 	"time"
 )
 
-func GetTools(configs map[string][]string) []string {
-	return configs["tools"]
-}
-
 func GetUserTools(env *Env) []string {
 	tools := []string{}
 
-	ct := GetCreationDate()
-
-	log.Println(ct)
+	ct := getCreationDate()
 
 	for _, dir := range getEnvToolsLocations(env) {
 		tools = append(tools, readFromBinDirNotWithSameCT(dir, ct)...)
@@ -31,7 +25,7 @@ func getEnvToolsLocations(env *Env) []string {
 	return strings.Split(path, ":")
 }
 
-func GetCreationDate() time.Time {
+func getCreationDate() time.Time {
 	etcFiles, err := ioutil.ReadDir("/etc")
 
 	if err != nil {

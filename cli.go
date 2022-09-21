@@ -25,24 +25,32 @@ func ParseCommand(Args []string) *CliCommand {
 
 	if cmd == "create" || cmd == "delete" {
 		cliCmd.User = "vne-user"
-		cliCmd.ConfigPath = os.Getenv("HOME") + "/.vne"
+		cliCmd.ConfigPath = ""
 	} else {
 		cliCmd.User = os.Getenv("USER")
 		cliCmd.ConfigPath = os.Getenv("HOME") + "/.vne"
 	}
+
+	skip := false
 
 	for i, arg := range Args {
 		if i == 0 || i == 1 {
 			continue
 		}
 
+		if skip {
+			skip = false
+		}
+
 		if arg == "-u" && i+1 < len(Args) {
 			cliCmd.User = Args[i+1]
+			skip = true
 			continue
 		}
 
 		if arg == "-d" && i+1 < len(Args) {
 			cliCmd.ConfigPath = Args[i+1]
+			skip = true
 			continue
 		}
 

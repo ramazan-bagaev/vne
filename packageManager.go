@@ -9,7 +9,7 @@ func PackageManagers() []string {
 	return []string{"apt-get", "yam", "pacman", "brew", "apk"}
 }
 
-func UploadLackingTools(env *Env) {
+func UploadLackingTools(env *Env, conf *Config) {
 	pms := GetAvailableToolsFromList(env, PackageManagers())
 
 	var pm string
@@ -19,7 +19,7 @@ func UploadLackingTools(env *Env) {
 		pm = pms[0]
 	}
 
-	for _, vneTool := range env.Tools {
+	for _, vneTool := range conf.GetTools() {
 		loadTool(vneTool, pm)
 	}
 }

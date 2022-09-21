@@ -1,25 +1,9 @@
 package main
 
 import (
-	"log"
 	"os"
 	"strings"
 )
-
-func GetEnvVars(configs map[string][]string) map[string]string {
-	envVars := make(map[string]string)
-	for _, line := range configs["envs"] {
-		split := strings.Split(line, "=")
-		if len(split) != 2 {
-			log.Println("can't parse env variable")
-			panic(1)
-		}
-
-		envVars[split[0]] = split[1]
-	}
-
-	return envVars
-}
 
 func GetUserEnvVars(env *Env) map[string]string {
 	envVars := make(map[string]string)
@@ -31,7 +15,7 @@ func GetUserEnvVars(env *Env) map[string]string {
 	return envVars
 }
 
-func UnloadEnvVarsToUser(env *Env) {
+func UnloadEnvVarsToUser(env *Env, conf *Config) {
 	fileName := env.Shell.GetMainEnvVarFile(env)
 
 	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -40,7 +24,7 @@ func UnloadEnvVarsToUser(env *Env) {
 
 	addedVars := ""
 
-	for k, v := range env.EnvVars {
+	for k, v := range conf.GetEnvVars() {
 		addedVars += "\nexport " + k + "=" + v + "\n"
 	}
 

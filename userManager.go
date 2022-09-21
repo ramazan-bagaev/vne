@@ -7,12 +7,12 @@ import (
 )
 
 type UserManager interface {
-	Create(user string)
+	Create(user string, conf *Config)
 	Delete(user string)
 	CheckUser(user string)
 }
 
-func (mc mac) Create(user string) {
+func (mc mac) Create(user string, conf *Config) {
 	mc.CheckUser("root")
 	log.Printf("start creating user: %s", user)
 
@@ -48,7 +48,7 @@ func (mc mac) CheckUser(user string) {
 	}
 }
 
-func (l linux) Create(user string) {
+func (l linux) Create(user string, conf *Config) {
 	l.CheckUser("root")
 	log.Printf("start creating user: %s", user)
 	s1 := "useradd"
