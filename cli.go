@@ -40,6 +40,7 @@ func ParseCommand(Args []string) *CliCommand {
 
 		if skip {
 			skip = false
+			continue
 		}
 
 		if arg == "-u" && i+1 < len(Args) {

@@ -60,6 +60,16 @@ func (c *Config) GetDirs() []string {
 	return c.configMap["dirs"]
 }
 
+func (c *Config) GetShell() string {
+	shell := c.configMap["shell"]
+
+	if len(shell) != 1 {
+		panic("shell should be specified and should be only one")
+	}
+
+	return c.configMap["shell"][0]
+}
+
 func (c *Config) SetEnvVars(varMap map[string]string) {
 	vars := []string{}
 
@@ -76,6 +86,10 @@ func (c *Config) SetTools(tools []string) {
 
 func (c *Config) SetDirs(dirs []string) {
 	c.configMap["dirs"] = dirs
+}
+
+func (c *Config) SetShell(shell string) {
+	c.configMap["shell"] = []string{shell}
 }
 
 func (a *Config) Minus(b *Config) *Config {
@@ -111,6 +125,7 @@ func (a *Config) Minus(b *Config) *Config {
 	res.SetEnvVars(resVars)
 	res.SetTools(resTools)
 	res.SetDirs(a.GetDirs())
+	res.SetShell(a.GetShell())
 
 	return res
 }

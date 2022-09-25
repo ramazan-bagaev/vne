@@ -24,6 +24,7 @@ type Shell interface {
 	GetEnvVarsLocations(env *Env) []string
 	GetMainEnvVarFile(env *Env) string
 	Name() string
+	Path() string
 }
 
 // zsh
@@ -52,6 +53,10 @@ func (c Zsh) Name() string {
 	return "zsh"
 }
 
+func (c Zsh) Path() string {
+	return "/bin/zsh"
+}
+
 // bash
 
 type Bash struct {
@@ -73,4 +78,8 @@ func (b Bash) GetMainEnvVarFile(env *Env) string {
 
 func (b Bash) Name() string {
 	return "bash"
+}
+
+func (b Bash) Path() string {
+	return "/bin/bash"
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"testing"
 )
 
@@ -16,7 +15,7 @@ func TestParseCommandCreate(t *testing.T) {
 func TestParseCommandCreateDefaults(t *testing.T) {
 	cmd := ParseCommand([]string{"vne", "create"})
 
-	if cmd.Cmd != "create" || cmd.ConfigPath != os.Getenv("HOME")+"/.vne" || cmd.User != "vne-user" {
+	if cmd.Cmd != "create" || cmd.ConfigPath != "" || cmd.User != "vne-user" {
 		t.Errorf("parse failed %s", cmd)
 	}
 }

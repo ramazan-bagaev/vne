@@ -77,6 +77,7 @@ func CreateDirs(e *Env, conf *Config) {
 func updateVNEConfig(configPath string, env *Env) {
 	envVars := GetUserEnvVars(env)
 	tools := GetUserTools(env)
+	shellPath := env.Shell.Path()
 
 	content := "[envs]\n"
 
@@ -89,6 +90,9 @@ func updateVNEConfig(configPath string, env *Env) {
 	for _, tool := range tools {
 		content += tool + "\n"
 	}
+
+	content += "[shell]\n"
+	content += shellPath + "\n"
 
 	err := os.WriteFile(configPath, []byte(content), 0644) // TODO: deal with permissions
 	Check(err)
