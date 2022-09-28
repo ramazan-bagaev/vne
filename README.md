@@ -15,6 +15,9 @@ Tool for transferring dev environment from one machine to another
 
 ## tags
 [env] - env variables
+
 [tools] - content of bin directories specified in the $PATH
+
 [shell] - shell location (/bin/bash; /bin/zsh ...)
+
 [dirs] - empty dirs to create
